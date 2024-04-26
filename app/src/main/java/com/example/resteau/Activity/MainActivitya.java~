@@ -1,0 +1,50 @@
+package com.example.resteau.Activity;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.TextView;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+import com.example.resteau.R;
+
+class MainActivitya extends AppCompatActivity {
+
+    private TextView qrCodeResultTv;
+    private final ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+    result -> {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            Intent data = result.getData();
+            if (data != null) {
+                String resultString = data.getStringExtra(ScanQrcodeActivity.QR_CODE_VALUE);
+                updateQrCodeResultTextView(resultString);
+            }
+        }
+    });
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_maina);
+
+        qrCodeResultTv = findViewById(R.id.qr_code_result_tv);
+        initButtonClickListener();
+    }
+
+    private void initButtonClickListener() {
+        Button startScanButton = findViewById(R.id.start_scan_button);
+        startScanButton.setOnClickListener(v -> {
+        Intent intentQrCode = new Intent(MainActivitya.this, ScanQrCodeActivity.class);
+        resultLauncher.launch(intentQrCode);
+    });
+    }
+
+    private void updateQrCodeResultTextView(String result) {
+        if (result != null) {
+            runOnUiThread(() -> qrCodeResultTv.setText(result));
+        }
+    }
+}
